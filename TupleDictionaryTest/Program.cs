@@ -8,16 +8,19 @@ namespace TupleTest
 {
     class Program
     {
-        class Key : IEqualityComparer<Key>
+        public class Key
         {
-            private int m_Key1;
-            private int m_Key2;
+            public int m_Key1;
+            public int m_Key2;
 
             public Key(int k1, int k2) { m_Key1 = k1; m_Key2 = k2; }
+        }
 
+        public class KeyEqualityComparer : IEqualityComparer<Key>
+        {
             #region IEqualityComparer<Key> Members
 
-            bool IEqualityComparer<Key>.Equals(Key x, Key y)
+            public bool Equals(Key x, Key y)
             {
                 if (x == null && y == null)
                     return true;
@@ -27,20 +30,18 @@ namespace TupleTest
                     return x.m_Key1.Equals(y.m_Key1) && x.m_Key2.Equals(y.m_Key2);
             }
 
-            int IEqualityComparer<Key>.GetHashCode(Key obj)
+            public int GetHashCode(Key obj)
             {
-                return new { m_Key1, m_Key2}.GetHashCode();  //.net hash func
-                /* FNV hash
+                //return new { obj.m_Key1, obj.m_Key2}.GetHashCode();  //.net hash func
+                // FNV hash
                 unchecked // Overflow is fine, just wrap
                 {
                     int hash = (int)2166136261;
                     // Suitable nullity checks etc, of course :)
-                    hash = hash * 16777619 ^ m_Key1;
-                    hash = hash * 16777619 ^ m_Key2;
-                    //hash = hash * 16777619 ^ field3.GetHashCode();
+                    hash = hash * 16777619 ^ obj.m_Key1;
+                    hash = hash * 16777619 ^ obj.m_Key2;
                     return hash;
                 }
-                */
             }
 
             #endregion
@@ -53,7 +54,14 @@ namespace TupleTest
 
             public override int GetHashCode()
             {
-                return new{Int1, Int2}.GetHashCode();
+                unchecked // Overflow is fine, just wrap
+                {
+                    int hash = (int)2166136261;
+                    // Suitable nullity checks etc, of course :)
+                    hash = hash * 16777619 ^ Int1;
+                    hash = hash * 16777619 ^ Int2;
+                    return hash;
+                }
             }
 
             public override bool Equals(object obj)
@@ -89,7 +97,7 @@ namespace TupleTest
         {
             int itemCount = 1000000;
             Dictionary<StructKey, int> m_StructDictionary = new Dictionary<StructKey, int>();
-            Dictionary<Key, int> m_KeyedDictionary = new Dictionary<Key, int>();
+            Dictionary<Key, int> m_KeyedDictionary = new Dictionary<Key, int>(new KeyEqualityComparer());
             Dictionary<Tuple<int, int>, int> m_TupleDictionary = new Dictionary<Tuple<int, int>, int>();
             Tuple<int, int>[] tuples = new Tuple<int, int>[itemCount];
             Key[] keys = new Key[itemCount];
