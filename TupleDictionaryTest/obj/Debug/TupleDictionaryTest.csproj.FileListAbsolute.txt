@@ -3,3 +3,9 @@ C:\work\test app\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplic
 C:\work\test app\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
 C:\work\test app\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleApplication1.exe
 C:\work\test app\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleApplication1.pdb
+C:\work\test app\TupleDictionaryTest\TupleDictionaryTest\bin\Debug\ConsoleApplication1.exe.config
+C:\work\test app\TupleDictionaryTest\TupleDictionaryTest\bin\Debug\ConsoleApplication1.exe
+C:\work\test app\TupleDictionaryTest\TupleDictionaryTest\bin\Debug\ConsoleApplication1.pdb
+C:\work\test app\TupleDictionaryTest\TupleDictionaryTest\obj\Debug\TupleDictionaryTest.csprojResolveAssemblyReference.cache
+C:\work\test app\TupleDictionaryTest\TupleDictionaryTest\obj\Debug\ConsoleApplication1.exe
+C:\work\test app\TupleDictionaryTest\TupleDictionaryTest\obj\Debug\ConsoleApplication1.pdb

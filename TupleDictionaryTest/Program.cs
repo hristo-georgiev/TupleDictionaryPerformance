@@ -45,14 +45,55 @@ namespace TupleTest
 
             #endregion
         }
+        #region Struct
+        struct StructKey : IEquatable<StructKey>
+        {
+            public int Int1 { get; set; }
+            public int Int2 { get; set; }
+
+            public override int GetHashCode()
+            {
+                return new{Int1, Int2}.GetHashCode();
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (obj is StructKey)
+                {
+                    StructKey compositeKey = (StructKey)obj;
+
+                    return ((this.Int1 == compositeKey.Int1) &&
+                            (this.Int2 == compositeKey.Int2));
+                }
+
+                return false;
+            }
+            public bool Equals(StructKey other)
+            {
+                return ((this.Int1 == other.Int1) && (this.Int2 == other.Int2));
+            }
+
+            public static bool operator ==(StructKey left, StructKey right)
+            {
+                return left.Equals(right);
+            }
+
+            public static bool operator !=(StructKey left, StructKey right)
+            {
+                return !left.Equals(right);
+            }
+         }
+        #endregion
 
         static void Main(string[] args)
         {
             int itemCount = 1000000;
+            Dictionary<StructKey, int> m_StructDictionary = new Dictionary<StructKey, int>();
             Dictionary<Key, int> m_KeyedDictionary = new Dictionary<Key, int>();
             Dictionary<Tuple<int, int>, int> m_TupleDictionary = new Dictionary<Tuple<int, int>, int>();
             Tuple<int, int>[] tuples = new Tuple<int, int>[itemCount];
             Key[] keys = new Key[itemCount];
+            StructKey[] structKays = new StructKey[itemCount];
             int[] indices = new int[itemCount];
 
             // Create a million keys (and tuples) with the same random values so that we can time access into both
@@ -68,6 +109,7 @@ namespace TupleTest
                 int k2 = rand.Next();
                 keys[n] = new Key(k1, k2);
                 tuples[n] = new Tuple<int, int>(k1, k2);
+                structKays[n] = new StructKey{ Int1 = k1, Int2 = k2};
                 indices[n] = n; // we'll shuffle later
             }
 
@@ -83,12 +125,33 @@ namespace TupleTest
 
             // Now we can test our access to either dictionary.
             Stopwatch timer = Stopwatch.StartNew();
+            //
+            timer.Reset();
+            timer.Start();
+            for (int n = 0; n < itemCount; ++n)
+                m_TupleDictionary.Add(tuples[n], n);
+
+            timer.Stop();
+            Console.WriteLine("Tuple Dictionary insertion, {0:f03} ms ({1:f03} µs/item)", timer.Elapsed.TotalMilliseconds, timer.Elapsed.TotalMilliseconds * 1000 / itemCount);
+
+            timer.Reset();
+            timer.Start();
+            int sumTupled = 0;
+            for (int n = 0; n < itemCount; ++n)
+                sumTupled += m_TupleDictionary[tuples[indices[n]]];
+
+            timer.Stop();
+            Console.WriteLine("Tuple Dictionary access, {0:f03} ms ({1:f03} µs/item)", timer.Elapsed.TotalMilliseconds, timer.Elapsed.TotalMilliseconds * 1000 / itemCount);
+            
+            timer.Reset();
+            timer.Start();
             for (int n = 0; n < itemCount; ++n)
                 m_KeyedDictionary.Add(keys[n], n);
 
             timer.Stop();
             Console.WriteLine("Keyed Dictionary insertion, {0:f03} ms ({1:f03} µs/item)", timer.Elapsed.TotalMilliseconds, timer.Elapsed.TotalMilliseconds * 1000 / itemCount);
 
+            timer.Reset();
             timer.Start();
             int sumKeyed = 0;
             for (int n = 0; n < itemCount; ++n)
@@ -97,20 +160,23 @@ namespace TupleTest
             timer.Stop();
             Console.WriteLine("Keyed Dictionary access, {0:f03} ms ({1:f03} µs/item)", timer.Elapsed.TotalMilliseconds, timer.Elapsed.TotalMilliseconds * 1000 / itemCount);
 
+            #region Struct
+            timer.Reset();
             timer.Start();
             for (int n = 0; n < itemCount; ++n)
-                m_TupleDictionary.Add(tuples[n], n);
+                m_StructDictionary.Add(structKays[n], n);
 
             timer.Stop();
-            Console.WriteLine("Tuple Dictionary insertion, {0:f03} ms ({1:f03} µs/item)", timer.Elapsed.TotalMilliseconds, timer.Elapsed.TotalMilliseconds * 1000 / itemCount);
-
+            Console.WriteLine("Struct Dictionary insertion, {0:f03} ms ({1:f03} µs/item)", timer.Elapsed.TotalMilliseconds, timer.Elapsed.TotalMilliseconds * 1000 / itemCount);
+            timer.Reset();
             timer.Start();
-            int sumTupled = 0;
+            int sumStruc = 0;
             for (int n = 0; n < itemCount; ++n)
-                sumTupled += m_TupleDictionary[tuples[indices[n]]];
+                sumStruc += m_StructDictionary[structKays[indices[n]]];
 
             timer.Stop();
-            Console.WriteLine("Tuple Dictionary access, {0:f03} ms ({1:f03} µs/item)", timer.Elapsed.TotalMilliseconds, timer.Elapsed.TotalMilliseconds * 1000 / itemCount);
+            Console.WriteLine("Struct Dictionary access, {0:f03} ms ({1:f03} µs/item)", timer.Elapsed.TotalMilliseconds, timer.Elapsed.TotalMilliseconds * 1000 / itemCount);
+            #endregion
 
             Console.WriteLine();
             if (sumKeyed == sumTupled)
